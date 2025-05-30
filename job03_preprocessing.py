@@ -101,6 +101,24 @@ def normalize_nutrients_comprehensive(text):
     text = re.sub(r'비타민\s*([A-K])\s*(\d+)', r'비타민\1\2', text)
     text = re.sub(r'비타민\s*([A-K])', r'비타민\1', text)
 
+    # b6, b12, d3, 등 알파벳+숫자 패턴 후처리
+    text = re.sub(r'\b([abcdekl])(\d{1,2})\b', lambda m: f'비타민{m.group(1).upper()}{m.group(2)}', text)
+
+    text = re.sub(r'vitamin\s*([a-zA-Z]\d*)', lambda m: f'비타민{m.group(1).upper()}', text, flags=re.IGNORECASE)
+    text = re.sub(r'비타민\s*([a-zA-Z]\d*)', lambda m: f'비타민{m.group(1).upper()}', text)
+
+    # 단독 알파벳 또는 b군 비타민이 소문자로만 등장할 경우 대문자로 변환
+    # 예: 'a', 'b2', 'e', 'd3' → 'A', 'B2', ...
+    def fix_single_vitamin(match):
+        val = match.group(1)
+        return val.upper()
+
+    # 단어 경계에서 a~k 한글자 또는 b군 조합
+    text = re.sub(r'\b([a-df-hj-kA-DF-HJ-K])\b', fix_single_vitamin, text)  # 단일 알파벳 대문자화
+    text = re.sub(r'\b(b[1-9]\d?)\b', fix_single_vitamin, text, flags=re.IGNORECASE)  # b1~b12 등
+
+    return text
+
     return text
 
 brand_keywords = [
@@ -375,12 +393,25 @@ print(final_df.head(3).to_string())
 
 # 12. 영양소 정규화 테스트
 print("\n=== 영양소 정규화 테스트 ===")
+# test_cases = [
+#     "면역 비타민 C d 3 아연 캡슐",
+#     "마그네슘 비타민 B 복합체",
+#     "오메가3 DHA EPA 루테인",
+#     "코엔자임 q10 콜라겐 비오틴",
+#     "종합비타민 미네랄 프로바이오틱스",
+# ]
+
 test_cases = [
-    "면역 비타민 C d 3 아연 캡슐",
-    "마그네슘 비타민 B 복합체",
-    "오메가3 DHA EPA 루테인",
-    "코엔자임 q10 콜라겐 비오틴",
-    "종합비타민 미네랄 프로바이오틱스",
+    "vitamin c와 d3를 함께 먹고 있어요",
+    "요즘 B1, b2, B6, b12를 챙겨요",
+    "a랑 e가 피부에 좋다길래 시작했어요",
+    "비타민 D와 K2는 같이 먹는 게 좋대",
+    "b complex 중에 b6하고 b12가 중요하다더라",
+    "d3를 먹으면서 칼슘 흡수를 돕고 있어요",
+    "c랑 e는 항산화 효과가 있어서 챙기고 있어",
+    "B2 b3 같이 먹으니 피로가 덜해요",
+    "a d는 눈이랑 뼈 건강에 좋다고 들었어요",
+    "E랑 k를 같이 복용하면 피부에 도움이 된대요",
 ]
 
 for test in test_cases:
