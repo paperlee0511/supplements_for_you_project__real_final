@@ -99,7 +99,7 @@ if __name__ == "__main__":
     df_products = preprocess_data_optimized(df_products)
 
     # 추천 실행
-    symptoms = ['골다공증', '눈건조증']
+    symptoms = ['눈떨림', '빈혈']
     for symptom in symptoms:
         print(f"\n✅ [{symptom}] 추천 결과:")
         result = recommend_products_hybrid(df_products, symptom, embedding_model)

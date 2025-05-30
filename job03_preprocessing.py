@@ -5,28 +5,175 @@ import time
 from multiprocessing import Pool, cpu_count
 import numpy as np
 
-# 1. 데이터 불러오기
-df = pd.read_csv('./cleaned_data/supplements.csv')
-print(df.info())
+# 1. 데이터 불러오기 및 컬럼 확인
+df = pd.read_csv('./cleaned_data/supplements.csv', quotechar='"', encoding='utf-8-sig')
+
+# 컬럼명 확인 및 정리
+print("원본 데이터 구조:")
+print(f"컬럼명: {df.columns.tolist()}")
+print(f"데이터 형태: {df.shape}")
 print(df.head())
 
+# 컬럼명 표준화 (순서: supplements, product, ingredient, review, url)
+expected_columns = ['supplements', 'product', 'ingredient', 'review', 'url']
+if len(df.columns) == 5:
+    df.columns = expected_columns
+    print(f"\n컬럼명 표준화 완료: {df.columns.tolist()}")
 
-def amplify_product_mentions(df, col_review='review', col_product='product', repeat=500):
-    df = df.copy()
-    df[col_review] = df.apply(
-        lambda row: (row[col_product] + ' ') * repeat + row[col_review], axis=1
-    )
-    return df
+# 데이터 타입 정리
+for col in ['supplements', 'product', 'ingredient', 'review']:
+    if col in df.columns:
+        df[col] = df[col].astype(str).str.replace(r'\s+', ' ', regex=True).str.strip()
 
-# 1-1. 제품명 기반 데이터 증폭
-df = amplify_product_mentions(df, repeat=500)
+print(f"\n데이터 정리 후:")
+print(df.info())
 
 
-# 0번째 열: 영양제 종류 정제 (띄어쓰기 제거 + 명칭 통일)
-df.iloc[:, 0] = df.iloc[:, 0].str.replace(' ', '', regex=False)  # 모든 공백 제거
+
+# 2. 개선된 비타민/영양성분 패턴 정의
+vitamin_patterns = [
+    # 1. 영어 vitamin 패턴들 (숫자 포함)
+    (re.compile(r'[Vv]itamin\s*([AaBbCcDdEeKk])(\d+)', re.IGNORECASE),
+     lambda m: f'비타민{m.group(1).upper()}{m.group(2)}'),
+    (re.compile(r'[Vv]itamin\s*([AaBbCcDdEeKk])', re.IGNORECASE),
+     lambda m: f'비타민{m.group(1).upper()}'),
+
+    # 2. 한글 음역 패턴들 (숫자 포함)
+    (re.compile(r'비타민\s*비\s*(\d+)', re.IGNORECASE), r'비타민B\1'),
+    (re.compile(r'비타민\s*비(\d+)', re.IGNORECASE), r'비타민B\1'),
+    (re.compile(r'비타민\s*디\s*(\d+)', re.IGNORECASE), r'비타민D\1'),
+    (re.compile(r'비타민\s*디(\d+)', re.IGNORECASE), r'비타민D\1'),
+
+    # 3. 한글 음역어들
+    (re.compile(r'비타민\s*비원', re.IGNORECASE), '비타민B1'),
+    (re.compile(r'비타민\s*씨', re.IGNORECASE), '비타민C'),
+    (re.compile(r'비타민\s*디(?!\d)', re.IGNORECASE), '비타민D'),
+    (re.compile(r'비타민\s*에이', re.IGNORECASE), '비타민A'),
+    (re.compile(r'비타민\s*이', re.IGNORECASE), '비타민E'),
+    (re.compile(r'비타민\s*케이', re.IGNORECASE), '비타민K'),
+
+    # 4. 일반적인 비타민 + 알파벳 패턴
+    (re.compile(r'비타민\s*([a-kA-K])(\d*)', re.IGNORECASE),
+     lambda m: f'비타민{m.group(1).upper()}{m.group(2)}'),
+
+    # 5. 미네랄 및 기타 영양소 패턴
+    (re.compile(r'마그네슘|마그네시움', re.IGNORECASE), '마그네슘'),
+    (re.compile(r'칼슘|칼시움', re.IGNORECASE), '칼슘'),
+    (re.compile(r'아연|징크', re.IGNORECASE), '아연'),
+    (re.compile(r'철분|철', re.IGNORECASE), '철분'),
+    (re.compile(r'오메가\s*3|omega\s*3', re.IGNORECASE), '오메가3'),
+    (re.compile(r'오메가\s*6|omega\s*6', re.IGNORECASE), '오메가6'),
+    (re.compile(r'dha|DHA', re.IGNORECASE), 'DHA'),
+    (re.compile(r'epa|EPA', re.IGNORECASE), 'EPA'),
+    (re.compile(r'코엔자임\s*q10|coenzyme\s*q10|코큐텐', re.IGNORECASE), '코엔자임Q10'),
+    (re.compile(r'루테인', re.IGNORECASE), '루테인'),
+    (re.compile(r'프로바이오틱스|유산균', re.IGNORECASE), '프로바이오틱스'),
+    (re.compile(r'콜라겐', re.IGNORECASE), '콜라겐'),
+    (re.compile(r'엽산|폴산', re.IGNORECASE), '엽산'),
+    (re.compile(r'비오틴', re.IGNORECASE), '비오틴'),
+]
+
+
+def normalize_nutrients_comprehensive(text):
+    """포괄적인 영양소 표기 정규화 함수"""
+    if pd.isna(text) or text == '':
+        return text
+
+    text = str(text)
+
+    # 기본 정규화 패턴 적용
+    for pattern, replacement in vitamin_patterns:
+        if callable(replacement):
+            text = pattern.sub(replacement, text)
+        else:
+            text = pattern.sub(replacement, text)
+
+    # 비타민 뒤의 알파벳 패턴 처리
+    def process_vitamin_context(match):
+        full_match = match.group(0)
+        vitamin_part = re.sub(r'\b([a-k])\b', lambda m: m.group(1).upper(), full_match, flags=re.IGNORECASE)
+        return vitamin_part
+
+    text = re.sub(r'비타민\s+([a-k\s\d]+)', process_vitamin_context, text, flags=re.IGNORECASE)
+
+    # 연속된 비타민 알파벳 + 숫자 조합 처리
+    text = re.sub(r'비타민\s*([A-K])\s*([A-K])\s*(\d+)', r'비타민\1\2\3', text)
+    text = re.sub(r'비타민\s*([A-K])\s*(\d+)', r'비타민\1\2', text)
+    text = re.sub(r'비타민\s*([A-K])', r'비타민\1', text)
+
+    return text
+
+brand_keywords = [
+    # 한글 브랜드
+    '센트룸', '솔가', '나우푸드', '닥터스베스트', '뉴트리라이트', '스완슨',
+    '라이프익스텐션', '내추럴팩터스', '네이처메이드', '칼슨랩스', '오쏘몰',
+
+    # 영문 브랜드
+    'Centrum', 'Solgar', 'Now Foods', 'Doctor\'s Best', 'Nutrilite', 'Swanson',
+    'Life Extension', 'Natural Factors', 'Nature Made', 'Carlson Labs', 'Orthomol',
+
+    # 기타
+    'GNC', '21st Century', 'Jarrow', 'California Gold Nutrition', 'Nature\'s Way'
+]
+
+def normalize_product_name(text):
+    """제품명 전용 정규화 + 브랜드 제거"""
+    if pd.isna(text) or text == '':
+        return text
+
+    text = str(text)
+    text = normalize_nutrients_comprehensive(text)
+
+    # 브랜드 제거
+    for brand in brand_keywords:
+        text = re.sub(re.escape(brand), '', text, flags=re.IGNORECASE)
+
+    # 특수 문자 제거 및 다중 공백 정리
+    text = re.sub(r'[^\w\s가-힣A-Za-z0-9]', ' ', text)
+    text = re.sub(r'\s+', ' ', text).strip()
+
+    # 비타민 단어 보정
+    words = text.split()
+    processed_words = []
+    for i, word in enumerate(words):
+        if i > 0 and ('비타민' in words[i - 1] or '비타민' in word):
+            if word.lower() in ['a', 'b', 'c', 'd', 'e', 'k']:
+                processed_words.append(word.upper())
+            elif re.match(r'^[a-k]\d*$', word, re.IGNORECASE):
+                processed_words.append(word.upper())
+            else:
+                processed_words.append(word)
+        else:
+            processed_words.append(word)
+
+    text = ' '.join(processed_words)
+    text = re.sub(r'비타민\s+([A-K]\d*)', r'비타민\1', text)
+
+    return text
+
+
+# 3. 제품명과 영양성분 정규화 적용
+print("\n=== 제품명 및 영양성분 정규화 ===")
+print("정규화 전 제품명 샘플:")
+print(df['product'].head())
+
+df['cleaned_product'] = df['product'].apply(normalize_product_name)
+df['ingredient'] = df['ingredient'].apply(normalize_nutrients_comprehensive)
+
+print("\n정규화 후 제품명 샘플:")
+print(df['product'].head())
+
+print("\n정규화 후 영양성분 샘플:")
+print(df['ingredient'].head())
+
+# 4. 영양제 종류 정제 (첫 번째 컬럼)
+print("\n=== 영양제 종류 정제 ===")
+print("정제 전:", df['supplements'].unique())
+
+df['supplements'] = df['supplements'].str.replace(' ', '', regex=False)
 
 # 명칭 통일
-df.iloc[:, 0] = df.iloc[:, 0].replace({
+supplement_mapping = {
     '남성용비타민': '남성종합비타민',
     '남성용종합비타민': '남성종합비타민',
     '여성용비타민': '여성종합비타민',
@@ -35,23 +182,41 @@ df.iloc[:, 0] = df.iloc[:, 0].replace({
     '남성멀티비타민': '남성종합비타민',
     '여성멀티비타민': '여성종합비타민',
     '임산부종합비타민': '임산부종합비타민',
-})
+}
 
-print("\n정제된 영양제 종류 고유값:")
-print(df.iloc[:, 0].unique())
+df['supplements'] = df['supplements'].replace(supplement_mapping)
+print("정제 후:", df['supplements'].unique())
 
-# 2. 성능 최적화를 위한 설정
-print(f"사용 가능한 CPU 코어 수: {cpu_count()}")
 
-# 3. 불용어를 set으로 변환 (검색 속도 O(1))
+# 5. 제품명과 영양성분을 리뷰에 증폭 (기존 500배 대신 개선된 방식)
+def amplify_nutrients_in_review(df, repeat_product= 500):
+    """제품명과 영양성분을 리뷰에 증폭"""
+    df = df.copy()
+
+    print(f"리뷰 증폭 시작: 제품명 {repeat_product}회")
+
+    def create_amplified_review(row):
+        # 정규화된 제품명과 영양성분을 반복해서 추가
+        product_amplified = (str(row['product']) + ' ') * repeat_product
+        original_review = str(row['review'])
+
+        return product_amplified + original_review
+
+    df['review'] = df.apply(create_amplified_review, axis=1)
+    return df
+
+
+df = amplify_nutrients_in_review(df, repeat_product=500)
+
+# 6. 불용어 및 보존 단어 설정
 stop_words = set([
     # 일반 동사/형용사
     '하다', '되다', '있다', '없다', '같다', '보다', '주다', '먹다', '좋다', '나쁘다',
     '많다', '적다', '크다', '작다', '들다', '꾸준하다', '훌륭하다', '탁월하다',
-    '만족하다', '넘다', '들어서다', '안되다', '좋아하다', '되어다', '깔끔하다', '해보다',
-    '해주다', '먹이다', '먹어주다', '아니다', '재다', '넘어가다', '사다', '빠르다',
-    '켜지다', '다만', '비싸다', '기다리다', '특별하다', '꼼꼼하다', '이다', '어렵다',
-    '않다', '먹기', '부분', '챙기다', '맛있다',
+    '만족하다', '넘다', '들어서다', '안되다', '좋아하다', '되어다', '깔끔하다',
+    '해보다', '해주다', '먹이다', '먹어주다', '아니다', '재다', '넘어가다', '사다',
+    '빠르다', '켜지다', '다만', '비싸다', '기다리다', '특별하다', '꼼꼼하다',
+    '이다', '어렵다', '않다', '먹기', '부분', '챙기다', '맛있다',
     # 명사
     '제품', '영양제', '구매', '구입', '사용', '가격', '포장', '배송', '리뷰',
     '후기', '품절', '유기농', '직구', '함량', '냄새', '부담', '구미', '젤리',
@@ -62,104 +227,30 @@ stop_words = set([
     '느낌', '기분', '만족', '불만',
 ])
 
-# 4. preserve_words도 set으로 변환
-preserve_words = set(['A', 'B', 'C', 'D', 'E', 'K', '손', '발', '목', '몸', '눈',
-                      '팔', '간', '장', '뇌', '뼈', '귀', '코', '위', '폐', '피'])
+preserve_words = set([
+    # 비타민 관련
+    'A', 'B', 'C', 'D', 'E', 'K', 'a', 'b', 'c', 'd', 'e', 'k',
+    '비타민A', '비타민B', '비타민C', '비타민D', '비타민E', '비타민K',
+    '비타민B1', '비타민B2', '비타민B6', '비타민B12', '비타민D3',
+    # 미네랄
+    '마그네슘', '칼슘', '아연', '철분', '셀레늄', '크롬', '망간',
+    # 기타 영양소
+    '오메가3', '오메가6', 'DHA', 'EPA', '코엔자임Q10', '루테인',
+    '프로바이오틱스', '콜라겐', '엽산', '비오틴',
+    # 신체 부위
+    '손', '발', '목', '몸', '눈', '팔', '간', '장', '뇌', '뼈', '귀', '코', '위', '폐', '피',
+    # 숫자
+    '1', '2', '3', '6', '12',
+])
 
-# 5. 정규표현식 컴파일 (성능 향상)
-# vitamin_patterns = [
-#     (re.compile(r'비타민\s*([AaBbCcDdEeKk])', re.IGNORECASE), r'비타민\1'),
-#     (re.compile(r'비타민([a-z])'), lambda m: f'비타민{m.group(1).upper()}'),
-#     (re.compile(r'비타민\s*[Bb]\s*(\d+)'), r'비타민B\1'),
-#     (re.compile(r'[Vv]itamin\s*([AaBbCcDdEeKk])'), r'비타민\1'),
-#     (re.compile(r'비타민\s*디\s*(?:3|three)', re.IGNORECASE), '비타민D'),
-#     (re.compile(r'비타민\s*씨', re.IGNORECASE), '비타민C'),
-# ]
-
-vitamin_patterns = [
-    (re.compile(r'[Vv]itamin\s*([AaBbCcDdEeKk])'), r'비타민\1'),
-    (re.compile(r'비타민\s*에이', re.IGNORECASE), '비타민A'),
-    (re.compile(r'비타민\s*비\s*(\d+)', re.IGNORECASE), r'비타민B\1'),
-    (re.compile(r'비타민\s*비(\d+)', re.IGNORECASE), r'비타민B\1'),
-    (re.compile(r'비타민\s*비원', re.IGNORECASE), '비타민B1'),
-    (re.compile(r'비타민\s*씨', re.IGNORECASE), '비타민C'),
-    (re.compile(r'비타민\s*디\s*(?:3|three)?', re.IGNORECASE), '비타민D'),
-    (re.compile(r'비타민\s*이', re.IGNORECASE), '비타민E'),
-    (re.compile(r'비타민\s*케이', re.IGNORECASE), '비타민K'),
-    (re.compile(r'비타민([a-z])'), lambda m: f'비타민{m.group(1).upper()}'),
-    (re.compile(r'비타민\s*([ABCDEFKabcdefk])'), lambda m: f'비타민{m.group(1).upper()}'),
-]
-
+# 7. 리뷰 전처리 함수
 special_char_pattern = re.compile('[^가-힣A-Za-z0-9]')
-
-
-
-
-
-
-def normalize_vitamins_optimized(text):
-    """최적화된 비타민 표기 정규화 함수"""
-    if pd.isna(text) or text == '':
-        return text
-
-    text = str(text)
-
-    # 컴파일된 정규표현식 사용
-    for pattern, replacement in vitamin_patterns:
-        if callable(replacement):
-            text = pattern.sub(replacement, text)
-        else:
-            text = pattern.sub(replacement, text)
-
-    return text
-
-
-def process_single_review(review_data):
-    """단일 리뷰 처리 함수 (멀티프로세싱용)"""
-    idx, review = review_data
-
-    if pd.isna(review):
-        return idx, ''
-
-    try:
-        review = str(review)
-        review = review.replace('|', ' ')
-
-        # 비타민 표기 정규화 (lower() 전에)
-        review = normalize_vitamins_optimized(review)
-
-        review = review.lower()
-
-        # 특수문자 제거 (컴파일된 패턴 사용)
-        review = special_char_pattern.sub(' ', review)
-
-        # 빈 문자열 체크
-        if not review.strip():
-            return idx, ''
-
-        # 형태소 분석
-        okt = Okt()  # 각 프로세스마다 새로운 인스턴스
-        tokens = okt.pos(review, stem=True)
-
-        words = []
-        for w, cls in tokens:
-            if w in preserve_words:
-                words.append(w)
-            elif cls in ['Noun', 'Adjective', 'Verb'] and len(w) > 1 and w not in stop_words:
-                words.append(w)
-
-        cleaned = ' '.join(words)
-        return idx, cleaned
-
-    except Exception as e:
-        print(f"오류 발생 (인덱스 {idx}): {e}")
-        return idx, ''
 
 
 def process_reviews_batch(reviews_batch):
     """배치 단위로 리뷰 처리"""
     results = []
-    okt = Okt()  # 배치당 하나의 인스턴스
+    okt = Okt()
 
     for idx, review in reviews_batch:
         if pd.isna(review):
@@ -168,12 +259,14 @@ def process_reviews_batch(reviews_batch):
 
         try:
             review = str(review)
-            review = review.replace('|', ' ')
+            review = re.sub(r'[|,]', ' ', review)
 
-            # 비타민 표기 정규화
-            review = normalize_vitamins_optimized(review)
-
+            # 영양소 정규화 (소문자 변환 전)
+            review = normalize_nutrients_comprehensive(review)
             review = review.lower()
+
+            # 소문자 변환 후 다시 영양소 정규화
+            review = normalize_nutrients_comprehensive(review)
             review = special_char_pattern.sub(' ', review)
 
             if not review.strip():
@@ -181,21 +274,34 @@ def process_reviews_batch(reviews_batch):
                 continue
 
             tokens = okt.pos(review, stem=True)
-
             words = []
+
             for w, cls in tokens:
-                if w in preserve_words:
+                w_normalized = normalize_nutrients_comprehensive(w)
+
+                # 보존 단어 체크
+                if w_normalized in preserve_words:
+                    words.append(w_normalized)
+                # 영양소 패턴 체크
+                elif re.match(r'(비타민[A-K]\d*|마그네슘|칼슘|아연|철분|오메가\d|DHA|EPA)', w_normalized, re.IGNORECASE):
+                    words.append(w_normalized)
+                # Alpha 클래스 처리
+                elif cls == 'Alpha':
+                    if w.lower() in ['a', 'b', 'c', 'd', 'e', 'k']:
+                        words.append(w.upper())
+                    continue
+                # 숫자 처리
+                elif cls == 'Number' and w in ['1', '2', '3', '6', '12']:
                     words.append(w)
+                # 일반 단어 처리
                 elif cls in ['Noun', 'Adjective', 'Verb'] and len(w) > 1 and w not in stop_words:
                     words.append(w)
 
             cleaned = ' '.join(words)
             results.append((idx, cleaned))
 
-            # 진행상황 출력
             if idx % 50 == 0:
                 print(f"배치 처리 중... {idx}")
-                print(f"결과: {cleaned}")
 
         except Exception as e:
             print(f"오류 발생 (인덱스 {idx}): {e}")
@@ -204,11 +310,10 @@ def process_reviews_batch(reviews_batch):
     return results
 
 
-# 6. 메인 처리 로직
-print(f"\n 총 {len(df)} 개의 리뷰 처리 시작...")
+# 8. 메인 처리 로직
+print(f"\n총 {len(df)}개의 리뷰 처리 시작...")
 start_time = time.time()
 
-# 배치 크기 설정 (메모리와 성능의 균형)
 batch_size = 50
 total_reviews = len(df)
 batches = []
@@ -220,56 +325,66 @@ for i in range(0, total_reviews, batch_size):
 
 print(f"총 {len(batches)}개 배치로 분할")
 
-# 배치별 처리 (멀티프로세싱 대신 순차 처리로 안정성 확보)
+# 배치별 처리
 all_results = []
 for batch_idx, batch in enumerate(batches):
     print(f"\n배치 {batch_idx + 1}/{len(batches)} 처리 중...")
     batch_results = process_reviews_batch(batch)
     all_results.extend(batch_results)
 
-    # 중간 진행률 표시
     progress = (batch_idx + 1) / len(batches) * 100
     elapsed_time = time.time() - start_time
     print(f"진행률: {progress:.1f}% | 경과시간: {elapsed_time:.1f}초")
 
-# 결과 정렬 및 적용
-all_results.sort(key=lambda x: x[0])  # 인덱스 순으로 정렬
-cleaned_sentences = [result[1] for result in all_results]
+# 결과 적용
+all_results.sort(key=lambda x: x[0])
+cleaned_reviews = [result[1] for result in all_results]
 
-# 7. 저장
-df['review'] = cleaned_sentences
-print(f"\n중복 제거 전: {len(df)}개")
-df.drop_duplicates(subset=['review'], inplace=True)
-print(f"중복 제거 후: {len(df)}개")
+# 9. 최종 데이터 구성 (기존 컬럼 유지, 리뷰만 정제된 것으로 교체)
+final_df = df.copy()
+final_df['review'] = cleaned_reviews
 
-df.to_csv('./cleaned_data/cleaned_supplements.csv', index=False, encoding='utf-8-sig')
+# 전처리된 제품명을 별도 컬럼으로 보관
+final_df['cleaned_product'] = final_df['product'].apply(normalize_product_name)
+
+# 중복 제거 (리뷰 기준)
+print(f"\n중복 제거 전: {len(final_df)}개")
+final_df.drop_duplicates(subset=['review'], inplace=True)
+print(f"중복 제거 후: {len(final_df)}개")
+
+# 새로운 컬럼 순서로 정리
+column_order = ['supplements', 'product', 'ingredient', 'review', 'url', 'cleaned_product']
+final_df = final_df[column_order]
+# 10. 저장
+output_path = './cleaned_data/cleaned_supplements.csv'
+final_df.to_csv(output_path, index=False, encoding='utf-8-sig')
 
 end_time = time.time()
 total_time = end_time - start_time
-print(f"\n 리뷰 전처리 완료! 총 소요시간: {total_time:.1f}초")
-print(f"평균 처리속도: {len(df) / total_time:.2f}개/초")
+print(f"\n리뷰 전처리 완료!")
+print(f"총 소요시간: {total_time:.1f}초")
+print(f"평균 처리속도: {len(final_df) / total_time:.2f}개/초")
+print(f"저장 경로: {output_path}")
 
-# 8. 정규화 결과 확인
-#  정규화 테스트 케이스 확장
-print("\n비타민 표기 정규화 테스트:")
+# 11. 결과 확인
+print("\n=== 최종 결과 확인 ===")
+print(f"최종 데이터 형태: {final_df.shape}")
+print(f"컬럼 순서: {final_df.columns.tolist()}")
+print("\n샘플 데이터:")
+print(final_df.head(3).to_string())
+
+# 12. 영양소 정규화 테스트
+print("\n=== 영양소 정규화 테스트 ===")
 test_cases = [
-    "비타민 a가 좋아요",           # A 소문자
-    "비타민 A 효과",               # A 대문자
-    "vitamin b1 복합체",           # vitamin + 숫자
-    "비타민 비1",                 # 한글 음역
-    "비타민 비 12",               # 띄어쓰기 있는 비타민B
-    "비타민 비원",                # 음역어
-    "비타민 씨",                 # 한글 C
-    "vitamin c 추천",            # 영어 C
-    "비타민 디3",                # D와 숫자
-    "vitamin D",                # 영어 대문자 D
-    "비타민 디",                 # 한글 D
-    "비타민 이",                 # 한글 E
-    "vitamin e",                # 영어 소문자 E
-    "비타민 케이",               # 한글 K
-    "Vitamin K",                # 영어 대문자 K
+    "면역 비타민 C d 3 아연 캡슐",
+    "마그네슘 비타민 B 복합체",
+    "오메가3 DHA EPA 루테인",
+    "코엔자임 q10 콜라겐 비오틴",
+    "종합비타민 미네랄 프로바이오틱스",
 ]
 
 for test in test_cases:
-    normalized = normalize_vitamins_optimized(test)
+    normalized = normalize_nutrients_comprehensive(test)
     print(f"'{test}' → '{normalized}'")
+
+print("\n전처리 완료!")

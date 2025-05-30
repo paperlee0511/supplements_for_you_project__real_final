@@ -8,11 +8,11 @@ import re
 df = pd.read_csv('./cleaned_data/cleaned_supplements.csv')
 
 # 2. 결측치 제거
-df = df[df['review'].notnull() & df['product'].notnull()]
-df = df[(df['review'].str.strip() != '') & (df['product'].str.strip() != '')]
+df = df[df['review'].notnull() & df['cleaned_product'].notnull()]
+df = df[(df['review'].str.strip() != '') & (df['cleaned_product'].str.strip() != '')]
 
 # 3. 리뷰 + 제품을 결합
-df['combined'] = df['review'] + ' ' + df['product']
+df['combined'] = df['review'] + ' ' + df['cleaned_product']
 
 # 4. 형태소 분석기 준비
 okt = Okt()
@@ -27,9 +27,9 @@ tokens = [clean_and_tokenize(sentence) for sentence in df['combined'].tolist()]
 # 6. Word2Vec 모델 학습
 embedding_model = Word2Vec(
     sentences=tokens,
-    vector_size=150,
-    window=15,
-    min_count=5,
+    vector_size=200,
+    window=20,
+    min_count=8,
     workers=4,
     epochs=100,
     sg=1  # Skip-gram 방식
