@@ -72,7 +72,7 @@ def expand_symptom_by_word2vec(symptom_query, embedding_model, topn_word=8):
 
 
 # ------------------- 추천 함수 -------------------
-def recommend_products_hybrid(df, symptom_query, embedding_model, topn=5):
+def recommend_products_hybrid(df, symptom_query, embedding_model, topn=10):
     expanded_tokens = expand_symptom_by_word2vec(symptom_query, embedding_model)
     print(f"🔍 확장된 키워드: {expanded_tokens}")
 
