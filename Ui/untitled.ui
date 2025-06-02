@@ -1,0 +1,1137 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>Form</class>
+ <widget class="QWidget" name="Form">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1141</width>
+    <height>897</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <widget class="QDockWidget" name="dockWidget">
+   <property name="geometry">
+    <rect>
+     <x>30</x>
+     <y>0</y>
+     <width>1091</width>
+     <height>861</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">/* QDockWidget 외곽 */
+QDockWidget {
+    background-color: transparent;
+    border: 1px solid #616161;
+    border-radius: 10px;
+}
+
+/* 내부 컨텐츠 배경만 (테두리 없음) */
+QDockWidget QWidget {
+    background-color: white;
+    border: none;
+    border-radius: 0px; /* 내부는 모서리 둥글지 않게 */
+}
+
+/* 타이틀 바 */
+QDockWidget::title {
+    background-color: #757575;
+    color: white;
+    padding: 12px;
+    font-weight: bold;
+    font-size: 14px;
+    height: 30px;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+    border: 1px solid #616161;
+}
+
+QDockWidget::close-button,
+QDockWidget::float-button {
+    background: transparent;
+    border: 1px solid #616161;
+    icon-size: 35px;               /* 아이콘 자체 크기 */
+    padding: 0px;                  /* 아이콘 여백 */
+    min-width: 25px;               /* 버튼 크기 */
+    min-height: 25px;
+    max-width: 25px;
+    max-height: 25px;
+}
+
+
+
+QDockWidget::close-button {
+    image: url(C:/intel_training/Ai_supplement/close_icon_off.png);
+}
+
+QDockWidget::float-button {
+    image: url(C:/intel_training/Ai_supplement/restore_icon.png);
+}
+
+QDockWidget::close-button:hover,
+QDockWidget::float-button:hover {
+    background-color: #BDBDBD;
+}
+
+QMainWindow mainWindow;
+mainWindow.setWindowIcon(QIcon(C:/intel_training/Ai_supplement/perilla_favicon.png));</string>
+   </property>
+   <widget class="QWidget" name="dockWidgetContents">
+    <widget class="QPushButton" name="pushButton">
+     <property name="geometry">
+      <rect>
+       <x>940</x>
+       <y>60</y>
+       <width>61</width>
+       <height>51</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <family>Leelawadee UI</family>
+       <pointsize>15</pointsize>
+       <weight>75</weight>
+       <bold>true</bold>
+       <strikeout>false</strikeout>
+      </font>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">QPushButton
+{
+background-color :#004D40;
+border-radius : 10px; /*모서리 둥글게*/
+padding : 4px; /*내부 여백*/
+border : 2px solid #004D40; /*테두리 추가*/
+color :  #E0F2F1;
+}
+
+QPushButton:hover
+{
+background-color : #E0F2F1;
+color : #004D40;
+
+}</string>
+     </property>
+     <property name="text">
+      <string>검색</string>
+     </property>
+    </widget>
+    <widget class="QLineEdit" name="lineEdit">
+     <property name="geometry">
+      <rect>
+       <x>80</x>
+       <y>60</y>
+       <width>921</width>
+       <height>51</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">QLineEdit
+{
+border-radius : 10px; /*모서리 둥글게*/
+padding : 4px; /*내부 여백*/
+border : 2px solid #004D40; /*테두리 추가*/
+color : #F57F17
+}
+
+
+QLineEdit:hover
+{
+background-color : #E0F2F1;
+
+}
+
+QLineEdit
+{
+	font-weight: bold;  /* 글씨 굵게 */
+    font-size : 16px;
+	color: black;                /* 입력된 텍스트 색상 */
+    font-style: leelawadee UI;
+}
+
+QLineEdit:!focus:empty 
+{
+     font-size : 16px;
+	color: gray;                 /* placeholder 텍스트 색상 */
+    font-style: leelawadee UI;
+}
+
+
+</string>
+     </property>
+     <property name="placeholderText">
+      <string>제품 또는 증상을 입력하세요</string>
+     </property>
+    </widget>
+    <widget class="QGroupBox" name="groupBox">
+     <property name="geometry">
+      <rect>
+       <x>80</x>
+       <y>130</y>
+       <width>921</width>
+       <height>321</height>
+      </rect>
+     </property>
+     <property name="font">
+      <font>
+       <pointsize>16</pointsize>
+      </font>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">QGroupBox
+{
+
+border-radius : 10px; /*모서리 둥글게*/
+padding : 4px; /*내부 여백*/
+border : 2px solid #1B5E20; /*테두리 추가*/
+color : #F57F17
+}</string>
+     </property>
+     <property name="title">
+      <string/>
+     </property>
+     <layout class="QGridLayout" name="gridLayout">
+      <item row="0" column="0">
+       <widget class="QLabel" name="label_2">
+        <property name="font">
+         <font>
+          <family>Leelawadee UI</family>
+          <pointsize>10</pointsize>
+          <weight>75</weight>
+          <bold>true</bold>
+         </font>
+        </property>
+        <property name="text">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;영양제 종류&lt;/p&gt;&lt;p align=&quot;center&quot;&gt;(supplements) &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QCheckBox" name="checkBox">
+        <property name="font">
+         <font>
+          <family>Leelawadee UI</family>
+          <pointsize>-1</pointsize>
+         </font>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">QCheckBox 
+{
+    spacing: 3px; /* 체크박스와 텍스트 사이 간격 */
+    font-size: 13px;
+    color: #333;
+}
+
+QCheckBox::indicator {
+    width: 15px;
+    height: 15px;
+    border: 1.5px solid gray;        /* 기본 테두리 색상 */
+    background-color: white;       /* 기본 배경색 */
+    border-radius: 1px; 		/*모서리 둥글게*/
+}
+
+QCheckBox::indicator:checked {
+    background-color: white;       /* 체크된 후 바탕색 */
+    border: 1.5px solid red;         /* 체크된 후 테두리 */
+    image: url(C:/intel_training/Ai_supplement/pill.png); /* 체크 표시 이미지 (선택 사항) */
+}
+
+
+QCheckBox::indicator:hover
+{
+background-color : #E0F2F1;
+
+}
+</string>
+        </property>
+        <property name="text">
+         <string>비타민</string>
+        </property>
+        <property name="checkable">
+         <bool>true</bool>
+        </property>
+        <property name="checked">
+         <bool>false</bool>
+        </property>
+        <property name="autoRepeat">
+         <bool>false</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="2">
+       <widget class="QCheckBox" name="checkBox_2">
+        <property name="font">
+         <font>
+          <family>Leelawadee UI</family>
+          <pointsize>-1</pointsize>
+         </font>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">QCheckBox 
+{
+    spacing: 3px; /* 체크박스와 텍스트 사이 간격 */
+    font-size: 13px;
+    color: #333;
+}
+
+QCheckBox::indicator {
+    width: 15px;
+    height: 15px;
+    border: 1.5px solid gray;        /* 기본 테두리 색상 */
+    background-color: white;       /* 기본 배경색 */
+    border-radius: 1px; 		/*모서리 둥글게*/
+}
+
+QCheckBox::indicator:checked {
+    background-color: white;       /* 체크된 후 바탕색 */
+    border: 1.5px solid red;         /* 체크된 후 테두리 */
+    image: url(C:/intel_training/Ai_supplement/pill.png); /* 체크 표시 이미지 (선택 사항) */
+}
+
+
+QCheckBox::indicator:hover
+{
+background-color : #E0F2F1;
+
+}
+</string>
+        </property>
+        <property name="text">
+         <string>미네랄</string>
+        </property>
+        <property name="checkable">
+         <bool>true</bool>
+        </property>
+        <property name="checked">
+         <bool>false</bool>
+        </property>
+        <property name="autoRepeat">
+         <bool>false</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0" rowspan="2">
+       <widget class="QLabel" name="label_3">
+        <property name="font">
+         <font>
+          <family>Leelawadee UI</family>
+          <pointsize>10</pointsize>
+          <weight>75</weight>
+          <bold>true</bold>
+         </font>
+        </property>
+        <property name="text">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;비타민 종류&lt;/p&gt;&lt;p align=&quot;center&quot;&gt;(vitamins) &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QCheckBox" name="checkBox_6">
+        <property name="font">
+         <font>
+          <family>Leelawadee UI</family>
+          <pointsize>-1</pointsize>
+         </font>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">QCheckBox 
+{
+    spacing: 3px; /* 체크박스와 텍스트 사이 간격 */
+    font-size: 13px;
+    color: #333;
+}
+
+QCheckBox::indicator {
+    width: 15px;
+    height: 15px;
+    border: 1.5px solid gray;        /* 기본 테두리 색상 */
+    background-color: white;       /* 기본 배경색 */
+    border-radius: 1px; 		/*모서리 둥글게*/
+}
+
+QCheckBox::indicator:checked {
+    background-color: white;       /* 체크된 후 바탕색 */
+    border: 1.5px solid red;         /* 체크된 후 테두리 */
+    image: url(C:/intel_training/Ai_supplement/pill.png); /* 체크 표시 이미지 (선택 사항) */
+}
+
+
+QCheckBox::indicator:hover
+{
+background-color : #E0F2F1;
+
+}
+</string>
+        </property>
+        <property name="text">
+         <string>비타민 A</string>
+        </property>
+        <property name="checkable">
+         <bool>true</bool>
+        </property>
+        <property name="checked">
+         <bool>false</bool>
+        </property>
+        <property name="autoRepeat">
+         <bool>false</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="2">
+       <widget class="QCheckBox" name="checkBox_5">
+        <property name="font">
+         <font>
+          <family>Leelawadee UI</family>
+          <pointsize>-1</pointsize>
+         </font>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">QCheckBox 
+{
+    spacing: 3px; /* 체크박스와 텍스트 사이 간격 */
+    font-size: 13px;
+    color: #333;
+}
+
+QCheckBox::indicator {
+    width: 15px;
+    height: 15px;
+    border: 1.5px solid gray;        /* 기본 테두리 색상 */
+    background-color: white;       /* 기본 배경색 */
+    border-radius: 1px; 		/*모서리 둥글게*/
+}
+
+QCheckBox::indicator:checked {
+    background-color: white;       /* 체크된 후 바탕색 */
+    border: 1.5px solid red;         /* 체크된 후 테두리 */
+    image: url(C:/intel_training/Ai_supplement/pill.png); /* 체크 표시 이미지 (선택 사항) */
+}
+
+
+QCheckBox::indicator:hover
+{
+background-color : #E0F2F1;
+
+}
+</string>
+        </property>
+        <property name="text">
+         <string>비타민 B</string>
+        </property>
+        <property name="checkable">
+         <bool>true</bool>
+        </property>
+        <property name="checked">
+         <bool>false</bool>
+        </property>
+        <property name="autoRepeat">
+         <bool>false</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="3">
+       <widget class="QCheckBox" name="checkBox_10">
+        <property name="font">
+         <font>
+          <family>Leelawadee UI</family>
+          <pointsize>-1</pointsize>
+         </font>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">QCheckBox 
+{
+    spacing: 3px; /* 체크박스와 텍스트 사이 간격 */
+    font-size: 13px;
+    color: #333;
+}
+
+QCheckBox::indicator {
+    width: 15px;
+    height: 15px;
+    border: 1.5px solid gray;        /* 기본 테두리 색상 */
+    background-color: white;       /* 기본 배경색 */
+    border-radius: 1px; 		/*모서리 둥글게*/
+}
+
+QCheckBox::indicator:checked {
+    background-color: white;       /* 체크된 후 바탕색 */
+    border: 1.5px solid red;         /* 체크된 후 테두리 */
+    image: url(C:/intel_training/Ai_supplement/pill.png); /* 체크 표시 이미지 (선택 사항) */
+}
+
+
+QCheckBox::indicator:hover
+{
+background-color : #E0F2F1;
+
+}
+</string>
+        </property>
+        <property name="text">
+         <string>비타민 C</string>
+        </property>
+        <property name="checkable">
+         <bool>true</bool>
+        </property>
+        <property name="checked">
+         <bool>false</bool>
+        </property>
+        <property name="autoRepeat">
+         <bool>false</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="4">
+       <widget class="QCheckBox" name="checkBox_7">
+        <property name="font">
+         <font>
+          <family>Leelawadee UI</family>
+          <pointsize>-1</pointsize>
+         </font>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">QCheckBox 
+{
+    spacing: 3px; /* 체크박스와 텍스트 사이 간격 */
+    font-size: 13px;
+    color: #333;
+}
+
+QCheckBox::indicator {
+    width: 15px;
+    height: 15px;
+    border: 1.5px solid gray;        /* 기본 테두리 색상 */
+    background-color: white;       /* 기본 배경색 */
+    border-radius: 1px; 		/*모서리 둥글게*/
+}
+
+QCheckBox::indicator:checked {
+    background-color: white;       /* 체크된 후 바탕색 */
+    border: 1.5px solid red;         /* 체크된 후 테두리 */
+    image: url(C:/intel_training/Ai_supplement/pill.png); /* 체크 표시 이미지 (선택 사항) */
+}
+
+
+QCheckBox::indicator:hover
+{
+background-color : #E0F2F1;
+
+}
+</string>
+        </property>
+        <property name="text">
+         <string>비타민 D</string>
+        </property>
+        <property name="checkable">
+         <bool>true</bool>
+        </property>
+        <property name="checked">
+         <bool>false</bool>
+        </property>
+        <property name="autoRepeat">
+         <bool>false</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="1">
+       <widget class="QCheckBox" name="checkBox_9">
+        <property name="font">
+         <font>
+          <family>Leelawadee UI</family>
+          <pointsize>-1</pointsize>
+         </font>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">QCheckBox 
+{
+    spacing: 3px; /* 체크박스와 텍스트 사이 간격 */
+    font-size: 13px;
+    color: #333;
+}
+
+QCheckBox::indicator {
+    width: 15px;
+    height: 15px;
+    border: 1.5px solid gray;        /* 기본 테두리 색상 */
+    background-color: white;       /* 기본 배경색 */
+    border-radius: 1px; 		/*모서리 둥글게*/
+}
+
+QCheckBox::indicator:checked {
+    background-color: white;       /* 체크된 후 바탕색 */
+    border: 1.5px solid red;         /* 체크된 후 테두리 */
+    image: url(C:/intel_training/Ai_supplement/pill.png); /* 체크 표시 이미지 (선택 사항) */
+}
+
+
+QCheckBox::indicator:hover
+{
+background-color : #E0F2F1;
+
+}
+</string>
+        </property>
+        <property name="text">
+         <string>비타민 E</string>
+        </property>
+        <property name="checkable">
+         <bool>true</bool>
+        </property>
+        <property name="checked">
+         <bool>false</bool>
+        </property>
+        <property name="autoRepeat">
+         <bool>false</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="2">
+       <widget class="QCheckBox" name="checkBox_3">
+        <property name="font">
+         <font>
+          <family>Leelawadee UI</family>
+          <pointsize>-1</pointsize>
+         </font>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">QCheckBox 
+{
+    spacing: 3px; /* 체크박스와 텍스트 사이 간격 */
+    font-size: 13px;
+    color: #333;
+}
+
+QCheckBox::indicator {
+    width: 15px;
+    height: 15px;
+    border: 1.5px solid gray;        /* 기본 테두리 색상 */
+    background-color: white;       /* 기본 배경색 */
+    border-radius: 1px; 		/*모서리 둥글게*/
+}
+
+QCheckBox::indicator:checked {
+    background-color: white;       /* 체크된 후 바탕색 */
+    border: 1.5px solid red;         /* 체크된 후 테두리 */
+    image: url(C:/intel_training/Ai_supplement/pill.png); /* 체크 표시 이미지 (선택 사항) */
+}
+
+
+QCheckBox::indicator:hover
+{
+background-color : #E0F2F1;
+
+}
+</string>
+        </property>
+        <property name="text">
+         <string>여성용 종합비타민</string>
+        </property>
+        <property name="checkable">
+         <bool>true</bool>
+        </property>
+        <property name="checked">
+         <bool>false</bool>
+        </property>
+        <property name="autoRepeat">
+         <bool>false</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="3">
+       <widget class="QCheckBox" name="checkBox_4">
+        <property name="font">
+         <font>
+          <family>Leelawadee UI</family>
+          <pointsize>-1</pointsize>
+         </font>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">QCheckBox 
+{
+    spacing: 3px; /* 체크박스와 텍스트 사이 간격 */
+    font-size: 13px;
+    color: #333;
+}
+
+QCheckBox::indicator {
+    width: 15px;
+    height: 15px;
+    border: 1.5px solid gray;        /* 기본 테두리 색상 */
+    background-color: white;       /* 기본 배경색 */
+    border-radius: 1px; 		/*모서리 둥글게*/
+}
+
+QCheckBox::indicator:checked {
+    background-color: white;       /* 체크된 후 바탕색 */
+    border: 1.5px solid red;         /* 체크된 후 테두리 */
+    image: url(C:/intel_training/Ai_supplement/pill.png); /* 체크 표시 이미지 (선택 사항) */
+}
+
+
+QCheckBox::indicator:hover
+{
+background-color : #E0F2F1;
+
+}
+</string>
+        </property>
+        <property name="text">
+         <string>남성용 종합비타민</string>
+        </property>
+        <property name="checkable">
+         <bool>true</bool>
+        </property>
+        <property name="checked">
+         <bool>false</bool>
+        </property>
+        <property name="autoRepeat">
+         <bool>false</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="4">
+       <widget class="QCheckBox" name="checkBox_8">
+        <property name="font">
+         <font>
+          <family>Leelawadee UI</family>
+          <pointsize>-1</pointsize>
+         </font>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">QCheckBox 
+{
+    spacing: 3px; /* 체크박스와 텍스트 사이 간격 */
+    font-size: 13px;
+    color: #333;
+}
+
+QCheckBox::indicator {
+    width: 15px;
+    height: 15px;
+    border: 1.5px solid gray;        /* 기본 테두리 색상 */
+    background-color: white;       /* 기본 배경색 */
+    border-radius: 1px; 		/*모서리 둥글게*/
+}
+
+QCheckBox::indicator:checked {
+    background-color: white;       /* 체크된 후 바탕색 */
+    border: 1.5px solid red;         /* 체크된 후 테두리 */
+    image: url(C:/intel_training/Ai_supplement/pill.png); /* 체크 표시 이미지 (선택 사항) */
+}
+
+
+QCheckBox::indicator:hover
+{
+background-color : #E0F2F1;
+
+}
+</string>
+        </property>
+        <property name="text">
+         <string>임산부용 종합비타민</string>
+        </property>
+        <property name="checkable">
+         <bool>true</bool>
+        </property>
+        <property name="checked">
+         <bool>false</bool>
+        </property>
+        <property name="autoRepeat">
+         <bool>false</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="0" rowspan="2">
+       <widget class="QLabel" name="label_4">
+        <property name="font">
+         <font>
+          <family>Leelawadee UI</family>
+          <pointsize>10</pointsize>
+          <weight>75</weight>
+          <bold>true</bold>
+         </font>
+        </property>
+        <property name="text">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;미네랄 종류&lt;/p&gt;&lt;p align=&quot;center&quot;&gt;(minera) &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="1">
+       <widget class="QCheckBox" name="checkBox_16">
+        <property name="font">
+         <font>
+          <family>Leelawadee UI</family>
+          <pointsize>-1</pointsize>
+         </font>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">QCheckBox 
+{
+    spacing: 3px; /* 체크박스와 텍스트 사이 간격 */
+    font-size: 13px;
+    color: #333;
+}
+
+QCheckBox::indicator {
+    width: 15px;
+    height: 15px;
+    border: 1.5px solid gray;        /* 기본 테두리 색상 */
+    background-color: white;       /* 기본 배경색 */
+    border-radius: 1px; 		/*모서리 둥글게*/
+}
+
+QCheckBox::indicator:checked {
+    background-color: white;       /* 체크된 후 바탕색 */
+    border: 1.5px solid red;         /* 체크된 후 테두리 */
+    image: url(C:/intel_training/Ai_supplement/pill.png); /* 체크 표시 이미지 (선택 사항) */
+}
+
+
+QCheckBox::indicator:hover
+{
+background-color : #E0F2F1;
+
+}
+</string>
+        </property>
+        <property name="text">
+         <string>칼슘</string>
+        </property>
+        <property name="checkable">
+         <bool>true</bool>
+        </property>
+        <property name="checked">
+         <bool>false</bool>
+        </property>
+        <property name="autoRepeat">
+         <bool>false</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="2">
+       <widget class="QCheckBox" name="checkBox_12">
+        <property name="font">
+         <font>
+          <family>Leelawadee UI</family>
+          <pointsize>-1</pointsize>
+         </font>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">QCheckBox 
+{
+    spacing: 3px; /* 체크박스와 텍스트 사이 간격 */
+    font-size: 13px;
+    color: #333;
+}
+
+QCheckBox::indicator {
+    width: 15px;
+    height: 15px;
+    border: 1.5px solid gray;        /* 기본 테두리 색상 */
+    background-color: white;       /* 기본 배경색 */
+    border-radius: 1px; 		/*모서리 둥글게*/
+}
+
+QCheckBox::indicator:checked {
+    background-color: white;       /* 체크된 후 바탕색 */
+    border: 1.5px solid red;         /* 체크된 후 테두리 */
+    image: url(C:/intel_training/Ai_supplement/pill.png); /* 체크 표시 이미지 (선택 사항) */
+}
+
+
+QCheckBox::indicator:hover
+{
+background-color : #E0F2F1;
+
+}
+</string>
+        </property>
+        <property name="text">
+         <string>콜린</string>
+        </property>
+        <property name="checkable">
+         <bool>true</bool>
+        </property>
+        <property name="checked">
+         <bool>false</bool>
+        </property>
+        <property name="autoRepeat">
+         <bool>false</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="3">
+       <widget class="QCheckBox" name="checkBox_13">
+        <property name="font">
+         <font>
+          <family>Leelawadee UI</family>
+          <pointsize>-1</pointsize>
+         </font>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">QCheckBox 
+{
+    spacing: 3px; /* 체크박스와 텍스트 사이 간격 */
+    font-size: 13px;
+    color: #333;
+}
+
+QCheckBox::indicator {
+    width: 15px;
+    height: 15px;
+    border: 1.5px solid gray;        /* 기본 테두리 색상 */
+    background-color: white;       /* 기본 배경색 */
+    border-radius: 1px; 		/*모서리 둥글게*/
+}
+
+QCheckBox::indicator:checked {
+    background-color: white;       /* 체크된 후 바탕색 */
+    border: 1.5px solid red;         /* 체크된 후 테두리 */
+    image: url(C:/intel_training/Ai_supplement/pill.png); /* 체크 표시 이미지 (선택 사항) */
+}
+
+
+QCheckBox::indicator:hover
+{
+background-color : #E0F2F1;
+
+}
+</string>
+        </property>
+        <property name="text">
+         <string>요오드</string>
+        </property>
+        <property name="checkable">
+         <bool>true</bool>
+        </property>
+        <property name="checked">
+         <bool>false</bool>
+        </property>
+        <property name="autoRepeat">
+         <bool>false</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="4">
+       <widget class="QCheckBox" name="checkBox_11">
+        <property name="font">
+         <font>
+          <family>Leelawadee UI</family>
+          <pointsize>-1</pointsize>
+         </font>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">QCheckBox 
+{
+    spacing: 3px; /* 체크박스와 텍스트 사이 간격 */
+    font-size: 13px;
+    color: #333;
+}
+
+QCheckBox::indicator {
+    width: 15px;
+    height: 15px;
+    border: 1.5px solid gray;        /* 기본 테두리 색상 */
+    background-color: white;       /* 기본 배경색 */
+    border-radius: 1px; 		/*모서리 둥글게*/
+}
+
+QCheckBox::indicator:checked {
+    background-color: white;       /* 체크된 후 바탕색 */
+    border: 1.5px solid red;         /* 체크된 후 테두리 */
+    image: url(C:/intel_training/Ai_supplement/pill.png); /* 체크 표시 이미지 (선택 사항) */
+}
+
+
+QCheckBox::indicator:hover
+{
+background-color : #E0F2F1;
+
+}
+</string>
+        </property>
+        <property name="text">
+         <string>철분</string>
+        </property>
+        <property name="checkable">
+         <bool>true</bool>
+        </property>
+        <property name="checked">
+         <bool>false</bool>
+        </property>
+        <property name="autoRepeat">
+         <bool>false</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="1">
+       <widget class="QCheckBox" name="checkBox_17">
+        <property name="font">
+         <font>
+          <family>Leelawadee UI</family>
+          <pointsize>-1</pointsize>
+         </font>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">QCheckBox 
+{
+    spacing: 3px; /* 체크박스와 텍스트 사이 간격 */
+    font-size: 13px;
+    color: #333;
+}
+
+QCheckBox::indicator {
+    width: 15px;
+    height: 15px;
+    border: 1.5px solid gray;        /* 기본 테두리 색상 */
+    background-color: white;       /* 기본 배경색 */
+    border-radius: 1px; 		/*모서리 둥글게*/
+}
+
+QCheckBox::indicator:checked {
+    background-color: white;       /* 체크된 후 바탕색 */
+    border: 1.5px solid red;         /* 체크된 후 테두리 */
+    image: url(C:/intel_training/Ai_supplement/pill.png); /* 체크 표시 이미지 (선택 사항) */
+}
+
+
+QCheckBox::indicator:hover
+{
+background-color : #E0F2F1;
+
+}
+</string>
+        </property>
+        <property name="text">
+         <string>마그네슘</string>
+        </property>
+        <property name="checkable">
+         <bool>true</bool>
+        </property>
+        <property name="checked">
+         <bool>false</bool>
+        </property>
+        <property name="autoRepeat">
+         <bool>false</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="2">
+       <widget class="QCheckBox" name="checkBox_14">
+        <property name="font">
+         <font>
+          <family>Leelawadee UI</family>
+          <pointsize>-1</pointsize>
+         </font>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">QCheckBox 
+{
+    spacing: 3px; /* 체크박스와 텍스트 사이 간격 */
+    font-size: 13px;
+    color: #333;
+}
+
+QCheckBox::indicator {
+    width: 15px;
+    height: 15px;
+    border: 1.5px solid gray;        /* 기본 테두리 색상 */
+    background-color: white;       /* 기본 배경색 */
+    border-radius: 1px; 		/*모서리 둥글게*/
+}
+
+QCheckBox::indicator:checked {
+    background-color: white;       /* 체크된 후 바탕색 */
+    border: 1.5px solid red;         /* 체크된 후 테두리 */
+    image: url(C:/intel_training/Ai_supplement/pill.png); /* 체크 표시 이미지 (선택 사항) */
+}
+
+
+QCheckBox::indicator:hover
+{
+background-color : #E0F2F1;
+
+}
+</string>
+        </property>
+        <property name="text">
+         <string>셀레늄</string>
+        </property>
+        <property name="checkable">
+         <bool>true</bool>
+        </property>
+        <property name="checked">
+         <bool>false</bool>
+        </property>
+        <property name="autoRepeat">
+         <bool>false</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="3">
+       <widget class="QCheckBox" name="checkBox_15">
+        <property name="font">
+         <font>
+          <family>Leelawadee UI</family>
+          <pointsize>-1</pointsize>
+         </font>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">QCheckBox 
+{
+    spacing: 3px; /* 체크박스와 텍스트 사이 간격 */
+    font-size: 13px;
+    color: #333;
+}
+
+QCheckBox::indicator {
+    width: 15px;
+    height: 15px;
+    border: 1.5px solid gray;        /* 기본 테두리 색상 */
+    background-color: white;       /* 기본 배경색 */
+    border-radius: 1px; 		/*모서리 둥글게*/
+}
+
+QCheckBox::indicator:checked {
+    background-color: white;       /* 체크된 후 바탕색 */
+    border: 1.5px solid red;         /* 체크된 후 테두리 */
+    image: url(C:/intel_training/Ai_supplement/pill.png); /* 체크 표시 이미지 (선택 사항) */
+}
+
+
+QCheckBox::indicator:hover
+{
+background-color : #E0F2F1;
+
+}
+</string>
+        </property>
+        <property name="text">
+         <string>아연</string>
+        </property>
+        <property name="checkable">
+         <bool>true</bool>
+        </property>
+        <property name="checked">
+         <bool>false</bool>
+        </property>
+        <property name="autoRepeat">
+         <bool>false</bool>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+    <zorder>groupBox</zorder>
+    <zorder>lineEdit</zorder>
+    <zorder>pushButton</zorder>
+   </widget>
+  </widget>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
