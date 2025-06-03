@@ -12,7 +12,10 @@ df = pd.read_csv('./cleaned_data/supplements.csv', quotechar='"', encoding='utf-
 print("원본 데이터 구조:")
 print(f"컬럼명: {df.columns.tolist()}")
 print(f"데이터 형태: {df.shape}")
-print(df.head())
+print(df.head(10))
+print(df.info()) # 행 렬이 표기 -> 611개 행이 있고 5개의 열이 있다.
+
+exit(0)
 
 # 컬럼명 표준화 (순서: supplements, product, ingredient, review, url)
 expected_columns = ['supplements', 'product', 'ingredient', 'review', 'url']
