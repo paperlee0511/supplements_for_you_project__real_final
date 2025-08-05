@@ -1,6 +1,11 @@
 # 💊 자연어 처리를 통한 리뷰 기반 영양제 추천
 
 ## 시연 영상
+유튜브 링크 : https://youtu.be/ueheTNRm8sw
+
+| | |
+|---|---|
+|![영양제UI영상_키워드](https://github.com/user-attachments/assets/c9aeb90d-2600-4b8a-bb1b-c6a587d82315)<br> 키워드검색 | ![영양제UI영상_검색](https://github.com/user-attachments/assets/2dc9b73e-3d74-4791-89bf-9238c882440f)<br> 입력검색 |
 
 
 
