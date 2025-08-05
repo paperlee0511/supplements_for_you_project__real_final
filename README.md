@@ -36,25 +36,25 @@
 
 ### word cloud
 <div>
-<img width="400" alt="image" src="https://github.com/user-attachments/assets/ed240d93-d81b-4dd3-a4a5-425bed72fa9a" />
+<img width="300" alt="image" src="https://github.com/user-attachments/assets/ed240d93-d81b-4dd3-a4a5-425bed72fa9a" />
 <br>
 종합비타민
 </div>
 
 <div>
-<img width="400" alt="image" src="https://github.com/user-attachments/assets/c23ea3af-bf85-4ae2-97ea-4afc0fbfb23b" />
+<img width="300" alt="image" src="https://github.com/user-attachments/assets/c23ea3af-bf85-4ae2-97ea-4afc0fbfb23b" />
 <br>
 칼슘
 </div>
 
 <div>
-<img width="400" alt="image" src="https://github.com/user-attachments/assets/bfa0d53d-3789-48a5-b796-99b7c1bfdb7c" />
+<img width="300" alt="image" src="https://github.com/user-attachments/assets/bfa0d53d-3789-48a5-b796-99b7c1bfdb7c" />
 <br>
 비타민D
 </div>
 
 <div>
-<img width="400" alt="image" src="https://github.com/user-attachments/assets/5d4cb0fb-540c-42fa-8f9d-6e753a6bcac5" />
+<img width="300" alt="image" src="https://github.com/user-attachments/assets/5d4cb0fb-540c-42fa-8f9d-6e753a6bcac5" />
 <br>
 아연
 </div>
