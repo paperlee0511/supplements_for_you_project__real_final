@@ -35,9 +35,11 @@
 - 코사인 유사도 : 제품간 유사성 계산
 
 ### word cloud
+<div>
 <img width="400" alt="image" src="https://github.com/user-attachments/assets/ed240d93-d81b-4dd3-a4a5-425bed72fa9a" />
 <br>
 종합비타민
+</div>
 
 <img width="400" alt="image" src="https://github.com/user-attachments/assets/c23ea3af-bf85-4ae2-97ea-4afc0fbfb23b" />
 <br>
